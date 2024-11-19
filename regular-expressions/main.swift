@@ -23,3 +23,16 @@ func readLogFile(fileName: String) -> [String]? {
     }
 }
 
+
+
+// MARK: --TEST FUNCTIONS
+
+func generateReport(fileName: String) {
+    print("Logs taken from file: \(fileName)")
+    
+    if let logs = readLogFile(fileName: fileName) {
+        print("Logs successfully read. Total logs: \(logs.count)")
+    }
+}
+let logFile = "/Users/aydgnme/Courses/PrT/labs/lab4/access_lab4.log" // Replace with your actual log file path
+generateReport(fileName: logFile)
