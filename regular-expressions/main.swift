@@ -110,6 +110,13 @@ func countRequestsByBrowser(logs: [String]) -> [String: Int] {
     return browserCount
 }
 
+// MARK: --COUNT SUCCESSFUL POST REQUESTS
+func countSuccessfulPostRequests(logs: [String]) -> Int {
+    return logs.filter { $0.contains("POST") && $0.contains("200") }.count
+}
+
+
+
 
 // MARK: --TEST FUNCTIONS
 
@@ -138,15 +145,18 @@ func generateReport(fileName: String) {
             searchEngineRequests.forEach { print($0) }
             
         }
-
+        
         //Count Errors
         let (clientErrors, serverErrors) = countErrors(logs: logs)
         print("\nClient errors: \(clientErrors), server errors: \(serverErrors)")
         
+        //Count requset from IP
         print("\nNumber of requests from IP 192.168.1.1:")
         let ipRequests = countRequestsFromIP(logs: logs, ip: "192.168.1.1")
         print(ipRequests)
         
+        
+        //Count Request from Browser
         print("\nRequest report per browser:")
         let browserReport = countRequestsByBrowser(logs: logs)
         if browserReport.isEmpty {
@@ -154,8 +164,15 @@ func generateReport(fileName: String) {
         } else {
             browserReport.forEach { print("\($0): \($1)") }
         }
-
-
+        
+        //Count SUCCESSFUL POST REQUESTS
+        print("\nNumber of successful POST requests (200): ")
+        let successfulPostRequests = countSuccessfulPostRequests(logs: logs)
+        print(successfulPostRequests)
+        
+        
+        
+        
     }
 }
 let logFile = "/Users/aydgnme/Courses/PrT/labs/lab4/access_lab4.log" // Replace with your actual log file path
