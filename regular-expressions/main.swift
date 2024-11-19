@@ -110,11 +110,38 @@ func countRequestsByBrowser(logs: [String]) -> [String: Int] {
     return browserCount
 }
 
-// MARK: --COUNT SUCCESSFUL POST REQUESTS
+//MARK: --COUNT SUCCESSFUL POST REQUESTS
 func countSuccessfulPostRequests(logs: [String]) -> Int {
     return logs.filter { $0.contains("POST") && $0.contains("200") }.count
 }
 
+//MARK: --COUNT REQUEST LAST 24H
+func countRequestsLast24Hours(logs: [String]) -> Int {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MMM dd yyyy, HH:mm:ss"
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    
+    let currentDate = Date()
+    let calendar = Calendar.current
+    var requestCount = 0
+    
+    for log in logs {
+        // Extract date from log line
+        guard let dateString = log.split(separator: "[", maxSplits: 1).last?.split(separator: "]").first else {
+            continue
+        }
+        
+        // Parse the date string
+        if let requestDate = dateFormatter.date(from: String(dateString)) {
+            let hoursDifference = calendar.dateComponents([.hour], from: requestDate, to: currentDate).hour ?? 0
+            if hoursDifference >= 0 && hoursDifference <= 24 {
+                requestCount += 1
+            }
+        }
+    }
+    
+    return requestCount
+}
 
 
 
@@ -165,15 +192,17 @@ func generateReport(fileName: String) {
             browserReport.forEach { print("\($0): \($1)") }
         }
         
-        //Count SUCCESSFUL POST REQUESTS
+        //Count successful post request
         print("\nNumber of successful POST requests (200): ")
         let successfulPostRequests = countSuccessfulPostRequests(logs: logs)
         print(successfulPostRequests)
         
-        
-        
-        
+        //Count requests in the last 24 hours
+        print("\nNumber of requests in the last 24 hours:")
+        let recentRequests = countRequestsLast24Hours(logs: logs)
+        print(recentRequests)
     }
 }
-let logFile = "/Users/aydgnme/Courses/PrT/labs/lab4/access_lab4.log" // Replace with your actual log file path
+
+let logFile = "access_lab4.log" // Replace with your actual log file path
 generateReport(fileName: logFile)
